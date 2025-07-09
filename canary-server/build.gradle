@@ -71,7 +71,8 @@ runtime {
     modules = [
         'java.xml',
         'java.naming',
-        'java.management'
+        'java.management',
+        'jdk.management'
     ]
 }
 
