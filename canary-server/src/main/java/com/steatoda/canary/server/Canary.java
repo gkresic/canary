@@ -1,5 +1,6 @@
 package com.steatoda.canary.server;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -13,9 +14,10 @@ public class Canary {
 	@Inject
 	@SuppressWarnings("unused")	// extra parameters are injected only to be initialized as soon as possible ("eager singletons")
 	public Canary(
-		RestServer restServer
+			RestServer restServer, MeterRegistry meterRegistry
 	) {
 		this.restServer = restServer;
+		this.meterRegistry = meterRegistry;
 	}
 
 	public void start() {
@@ -42,7 +44,7 @@ public class Canary {
 
 		LOG.debug("Canary {} is initializing shutdown...", CanaryProperties.get().getVersion());
 
-		// anything?
+		meterRegistry.close();
 		
 		LOG.info("Canary {} successfully shut down - bye!", CanaryProperties.get().getVersion());
 		
@@ -51,5 +53,6 @@ public class Canary {
 	private static final Logger LOG = LoggerFactory.getLogger(Canary.class);
 
 	private final RestServer restServer;
+	private final MeterRegistry meterRegistry;
 
 }

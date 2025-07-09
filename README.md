@@ -30,6 +30,14 @@ Returns app status.
 curl --location "http://localhost:8001/status"
 ```
 
+### `GET @ /metrics`
+
+Prometheus metrics.
+
+```
+curl --location "http://localhost:8001/metrics"
+```
+
 ### `GET @ /error`
 
 Simulates an error in app (resulting in a customized error response).

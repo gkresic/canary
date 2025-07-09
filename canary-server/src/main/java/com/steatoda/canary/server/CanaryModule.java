@@ -2,6 +2,21 @@ package com.steatoda.canary.server;
 
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import dagger.Binds;
+import io.github.mweirauch.micrometer.jvm.extras.ProcessMemoryMetrics;
+import io.github.mweirauch.micrometer.jvm.extras.ProcessThreadMetrics;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
+import io.micrometer.core.instrument.binder.logging.LogbackMetrics;
+import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics;
+import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
+import io.micrometer.core.instrument.binder.system.UptimeMetrics;
+import io.micrometer.prometheusmetrics.PrometheusConfig;
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
+import io.micrometer.prometheusmetrics.PrometheusRenameFilter;
 import jakarta.inject.Singleton;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -32,6 +47,14 @@ public interface CanaryModule {
 			.addModule(new Jdk8Module())
 			.build();
 	}
+
+	@Binds
+	@Singleton
+	MeterRegistry provideMeterRegistry(CanaryMeterRegistry canaryMeterRegistry);
+
+	@Binds
+	@Singleton
+	PrometheusMeterRegistry providePrometheusMeterRegistry(CanaryMeterRegistry canaryMeterRegistry);
 
 	@Provides
 	static CanaryStatus provideStatus() {
