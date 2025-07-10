@@ -9,6 +9,7 @@ import com.steatoda.canary.server.rest.HelidonModule;
 @Singleton
 @Component(modules = {
 	CanaryModule.class,
+	TracingModule.class,
 	HelidonModule.class,
 })
 public interface CanaryComponent {

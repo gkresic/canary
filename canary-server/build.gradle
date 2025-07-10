@@ -25,22 +25,32 @@ dependencies {
     implementation 'com.google.dagger:dagger:2.56.2'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.56.2'
 
-    implementation 'io.helidon.common:helidon-common-media-type:4.2.3'
-    implementation 'io.helidon.config:helidon-config-yaml:4.2.3'
-    implementation 'io.helidon.http.media:helidon-http-media-jackson:4.2.3'
-    implementation 'io.helidon.webserver:helidon-webserver:4.2.3'
-    implementation 'io.helidon.logging:helidon-logging-slf4j:4.2.3'
-    implementation 'io.helidon.http.encoding:helidon-http-encoding-gzip:4.2.3'
+    implementation platform('io.helidon:helidon-bom:4.2.3')
+    implementation 'io.helidon.common:helidon-common-media-type'
+    implementation 'io.helidon.config:helidon-config-yaml'
+    implementation 'io.helidon.http.media:helidon-http-media-jackson'
+    implementation 'io.helidon.webserver:helidon-webserver'
+    implementation 'io.helidon.logging:helidon-logging-slf4j'
+    implementation 'io.helidon.http.encoding:helidon-http-encoding-gzip'
 
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.19.1'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.19.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.19.1'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.1'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.19.1'
+    implementation platform('com.fasterxml.jackson:jackson-bom:2.19.1')
+    implementation 'com.fasterxml.jackson.core:jackson-annotations'
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
 
-    implementation 'io.micrometer:micrometer-core:1.15.1'
-    implementation 'io.micrometer:micrometer-registry-prometheus:1.15.1'
+    implementation platform('io.micrometer:micrometer-bom:1.15.1')
+    implementation 'io.micrometer:micrometer-core'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'io.github.mweirauch:micrometer-jvm-extras:0.2.2'
+
+    implementation platform('io.micrometer:micrometer-tracing-bom:1.5.1')
+    implementation 'io.micrometer:micrometer-tracing'
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation platform('io.opentelemetry:opentelemetry-bom:1.51.0')
+    implementation 'io.opentelemetry:opentelemetry-sdk'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'

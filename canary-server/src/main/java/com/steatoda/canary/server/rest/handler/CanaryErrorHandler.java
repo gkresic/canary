@@ -8,6 +8,8 @@ import io.helidon.http.Status;
 import io.helidon.webserver.http.ErrorHandler;
 import io.helidon.webserver.http.ServerRequest;
 import io.helidon.webserver.http.ServerResponse;
+import io.micrometer.tracing.Span;
+import io.micrometer.tracing.Tracer;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,30 +17,57 @@ import org.slf4j.LoggerFactory;
 public class CanaryErrorHandler implements ErrorHandler<Throwable> {
 
 	@Inject
-	public CanaryErrorHandler() {}
+	public CanaryErrorHandler(Tracer tracer) {
+		this.tracer = tracer;
+	}
 
 	@Override
 	public void handle(ServerRequest request, ServerResponse response, Throwable throwable) {
 
-		if (throwable instanceof NotFoundException he)
-			throwable = new CanaryUnsupportedOperationException(endpointIdentifier(request));
+		reportToTracer(request, throwable);
 
-		// internal server errors deserve special treatment
+		CanaryErrorException cee = mapToCanaryErrorException(request, throwable);
+
+		// internal server errors deserve a special treatment
 		if (throwable instanceof CanaryServerErrorException ce) {
 			logError("API internal server error: " + ce.messageToLog(), request, ce);
 			send(response, ce);
 			return;
 		}
 
-		if (throwable instanceof CanaryErrorException ce) {
-			LOG.warn("API error {}", ce.error());
-			send(response, ce);
+		LOG.warn("API error {}", cee.error());
+
+		send(response, cee);
+
+	}
+
+	private void reportToTracer(ServerRequest request, Throwable throwable) {
+
+		Span currentSpan = tracer.currentSpan();
+
+		if (currentSpan == null) {
+			logError("REST request without a span", request, throwable);
 			return;
 		}
 
-		// WTF?!
-		logError("Unknown API exception", request, throwable);
-		send(response, new CanaryServerErrorException("Unknown exception thrown during API routing, see previous log entries for more details"));
+		currentSpan.error(throwable);
+
+	}
+
+	private CanaryErrorException mapToCanaryErrorException(ServerRequest request, Throwable throwable) {
+
+		// return CanaryErrorException(s) verbatim
+		if (throwable instanceof CanaryErrorException cee)
+			return cee;
+
+		// map well-known and expected  non-CanaryErrorException(s)
+
+		if (throwable instanceof NotFoundException)
+			return new CanaryUnsupportedOperationException(endpointIdentifier(request));
+
+		// wrap any unknowns in CanaryServerErrorException
+
+		return new CanaryServerErrorException("Unknown exception thrown during API routing", throwable);
 
 	}
 
@@ -70,5 +99,7 @@ public class CanaryErrorHandler implements ErrorHandler<Throwable> {
 	}
 
     private static final Logger LOG = LoggerFactory.getLogger(CanaryErrorHandler.class);
+
+	private final Tracer tracer;
 
 }
