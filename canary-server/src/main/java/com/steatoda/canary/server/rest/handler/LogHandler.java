@@ -1,12 +1,12 @@
 package com.steatoda.canary.server.rest.handler;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
-import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,25 +21,30 @@ import io.helidon.webserver.http.ServerResponse;
 public class LogHandler implements Handler {
 
 	@Inject
-	public LogHandler() {}
+	public LogHandler(MeterRegistry meterRegistry) {
+		this.meterRegistry = meterRegistry;
+	}
 
 	@Override
 	public void handle(ServerRequest request, ServerResponse response) {
 
-		request.context().register(LogHandler.class, StopWatch.createStarted());
+		request.context().register(LogHandler.class, Timer.start(meterRegistry));
 
 		response.whenSent(() -> {
 
-			StopWatch stopwatch = request.context().get(LogHandler.class, StopWatch.class).orElseThrow();
+			Timer.Sample timerSample = request.context().get(LogHandler.class, Timer.Sample.class).orElseThrow();
 
-			// TODO instead of logging, report to Prometheus
-			LOG.info("Served {} @ {} {} {} in {}ms",
-				request.prologue().method().text(),
-				request.path().absolute().path(),
-				extractRouteName(request),
-				request.remotePeer().address(),
-				stopwatch.getTime(TimeUnit.MILLISECONDS)
+			String routeName = extractRouteName(request);
+
+			long durationNano = timerSample.stop(
+				Timer.builder("canary.rest.request")
+					.description("API requests")
+					.tag("service", routeName)
+					.publishPercentiles(0.5, 0.9, 0.95, 0.99)
+					.register(meterRegistry)
 			);
+
+			LOG.info("Served {} for {} in {}ms", routeName, request.remotePeer().address(), Math.round(durationNano / 1_000_000.0));
 
 		});
 
@@ -61,5 +66,7 @@ public class LogHandler implements Handler {
 	}
 
 	private static final Logger LOG = LoggerFactory.getLogger(LogHandler.class);
+
+	private final MeterRegistry meterRegistry;
 
 }
