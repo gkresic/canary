@@ -3,8 +3,13 @@ package com.steatoda.canary.server.rest;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import com.steatoda.canary.server.error.CanaryInvalidParameterException;
-import com.steatoda.canary.server.rest.param.*;
-import dagger.Binds;
+import com.steatoda.canary.server.rest.handler.CanaryErrorHandler;
+import com.steatoda.canary.server.rest.param.BooleanDeserializer;
+import com.steatoda.canary.server.rest.param.Deserializer;
+import com.steatoda.canary.server.rest.param.InstantDeserializer;
+import com.steatoda.canary.server.rest.param.IntegerDeserializer;
+import com.steatoda.canary.server.rest.param.StringDeserializer;
+import com.steatoda.canary.server.rest.param.UUIDDeserializer;
 import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.ClassKey;
@@ -13,11 +18,13 @@ import io.helidon.common.media.type.MediaType;
 import io.helidon.common.media.type.MediaTypes;
 import io.helidon.config.Config;
 import io.helidon.config.ConfigSources;
+import io.helidon.http.DirectHandler;
 import io.helidon.http.media.MediaContext;
 import io.helidon.http.media.MediaContextConfig;
 import io.helidon.http.media.jackson.JacksonSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.helidon.webserver.WebServer;
+import io.helidon.webserver.http.DirectHandlers;
+import io.helidon.webserver.http.HttpRouting;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -50,13 +57,36 @@ public interface HelidonModule {
 			.build();
 	}
 
-	@Binds
+	@Provides
 	@Singleton
-	RestServer provideRestService(HelidonServer helidonService);
+	static WebServer provideHelidonWebServer(
+		Config config,
+		MediaContext mediaContext,
+		RootRouter rootRouter,
+		CanaryErrorHandler canaryErrorHandler
+	) {
+
+		// use CanaryDirectHandler for handling all "direct" events
+		DirectHandlers.Builder directHandlersBuilder = DirectHandlers.builder();
+		for (DirectHandler.EventType eventType : DirectHandler.EventType.values()) {
+			directHandlersBuilder.addHandler(eventType, canaryErrorHandler);
+		}
+
+		return WebServer.builder()
+			.config(config.get("server"))
+			.mediaContext(mediaContext)
+			.routing(HttpRouting.builder()
+				.register(rootRouter)
+				.error(Throwable.class, canaryErrorHandler)
+			)
+			.directHandlers(directHandlersBuilder.build())
+			.build();
+
+	}
 
 	@Provides
 	@Singleton
-	static Deserializer.ExceptionFactory provideExceptionFactory() {
+	static Deserializer.ExceptionFactory provideDeserializerExceptionFactory() {
 		return CanaryInvalidParameterException::new;
 	}
 
@@ -94,8 +124,5 @@ public interface HelidonModule {
 	static Deserializer<?> provideStringDeserializer(Deserializer.ExceptionFactory exceptionFactory) {
 		return new StringDeserializer(exceptionFactory);
 	}
-
-	@SuppressWarnings("unused")
-    Logger LOG = LoggerFactory.getLogger(HelidonModule.class);
 
 }

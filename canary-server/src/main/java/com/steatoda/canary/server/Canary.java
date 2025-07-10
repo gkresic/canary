@@ -1,10 +1,10 @@
 package com.steatoda.canary.server;
 
+import io.helidon.webserver.WebServer;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
-import com.steatoda.canary.server.rest.RestServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +14,10 @@ public class Canary {
 	@Inject
 	@SuppressWarnings("unused")	// extra parameters are injected only to be initialized as soon as possible ("eager singletons")
 	public Canary(
-			RestServer restServer, MeterRegistry meterRegistry
+		WebServer helidonWebServer,
+		MeterRegistry meterRegistry
 	) {
-		this.restServer = restServer;
+		this.helidonWebServer = helidonWebServer;
 		this.meterRegistry = meterRegistry;
 	}
 
@@ -24,7 +25,7 @@ public class Canary {
 		
 		LOG.debug("Canary {} starting...", CanaryProperties.get().getVersion());
 
-		restServer.start();
+		helidonWebServer.start();
 
 		LOG.info("Canary {} is up and runnin'", CanaryProperties.get().getVersion());
 
@@ -34,7 +35,7 @@ public class Canary {
 		
 		LOG.debug("Canary {} stopping...", CanaryProperties.get().getVersion());
 
-		restServer.stop();
+		helidonWebServer.stop();
 
 		LOG.info("Canary {} stopped", CanaryProperties.get().getVersion());
 
@@ -52,7 +53,7 @@ public class Canary {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Canary.class);
 
-	private final RestServer restServer;
+	private final WebServer helidonWebServer;
 	private final MeterRegistry meterRegistry;
 
 }
