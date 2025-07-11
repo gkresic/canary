@@ -62,7 +62,8 @@ public interface HelidonModule {
 	static WebServer provideHelidonWebServer(
 		Config config,
 		MediaContext mediaContext,
-		RootRouter rootRouter,
+		DefaultRootRouter defaultRootRouter,
+		PrivateRootRouter privateRootRouter,
 		CanaryErrorHandler canaryErrorHandler
 	) {
 
@@ -76,7 +77,11 @@ public interface HelidonModule {
 			.config(config.get("server"))
 			.mediaContext(mediaContext)
 			.routing(HttpRouting.builder()
-				.register(rootRouter)
+				.register(defaultRootRouter)
+				.error(Throwable.class, canaryErrorHandler)
+			)
+			.routing("private", HttpRouting.builder()
+				.register(privateRootRouter)
 				.error(Throwable.class, canaryErrorHandler)
 			)
 			.directHandlers(directHandlersBuilder.build())

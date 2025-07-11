@@ -1,3 +1,7 @@
 server:
+  name: public
   host: "0.0.0.0"
   port: 8001
+  sockets:
+    - name: private
+      port: 8011
