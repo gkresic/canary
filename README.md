@@ -12,11 +12,9 @@ Test startup time: `date +"%Y-%m-%d %H:%M:%S.%N%:z"; <app-binary>`
 
 Test max RSS: `/usr/bin/time -v <app-binary>`
 
-### jlink version
+### Docker
 
-Build: `./gradlew :canary-server:runtime`
-
-Run: `canary-server/build/image/bin/canary-server`
+Run: `docker run -it --publish 127.0.0.1:8001:8001 ghcr.io/gkresic/canary-server`
 
 ## Exposed endpoints
 

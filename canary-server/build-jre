@@ -1,0 +1,9 @@
+#!/bin/sh
+
+jlink \
+	--add-modules java.base,java.xml,java.naming,java.management,jdk.management \
+	--strip-debug \
+	--no-man-pages \
+	--no-header-files \
+	--compress=zip-6 \
+	--output `dirname $0`/jre

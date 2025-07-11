@@ -6,8 +6,8 @@ allprojects {
 
     apply plugin: 'idea'
 
-    group 'com.steatoda.canary'
+    group = 'com.steatoda.canary'
 
-    version '0.1.0-SNAPSHOT'
+    version = '0.1.0-SNAPSHOT'
 
 }
