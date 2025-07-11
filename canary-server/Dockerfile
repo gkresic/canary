@@ -12,10 +12,12 @@ LABEL org.opencontainers.image.licenses=MIT
 
 ENV JAVA_HOME=/opt/jre
 ENV PATH "${JAVA_HOME}/bin:${PATH}"
-COPY --from=jre-build /opt/jre $JAVA_HOME
+COPY --from=jre-build /opt/jre ${JAVA_HOME}
 
-COPY build/install/canary-server/ /opt/app
+ENV APP_HOME=/opt/app
 
-WORKDIR /opt/app
+COPY build/install/canary-server/ ${APP_HOME}
+
+WORKDIR ${APP_HOME}
 
 ENTRYPOINT [ "bin/canary-server" ]
