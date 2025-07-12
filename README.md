@@ -14,11 +14,11 @@ Test max RSS: `/usr/bin/time -v <app-binary>`
 
 ### Docker
 
-Run: `docker run -it --publish 127.0.0.1:8001:8001 --publish 127.0.0.1:8011:8011 ghcr.io/gkresic/canary-server`
+Run: `docker run -it --publish 127.0.0.1:8000:8000 --publish 127.0.0.1:9000:9000 ghcr.io/gkresic/canary-server`
 
 ## Exposed endpoints
 
-By default, server listens on `localhost` on ports `8001` (public endpoints) and `8011` (private endpoints).
+By default, server listens on `localhost` on ports `8000` (public endpoints) and `9000` (private endpoints).
 
 ### Public endpoints
 
@@ -29,7 +29,7 @@ These are meant to be publicly exposed on reverse proxy.
 Returns app status.
 
 ```
-curl --location "http://localhost:8001/status"
+curl --location "http://localhost:8000/status"
 ```
 
 #### ► `GET @ /error`
@@ -37,7 +37,7 @@ curl --location "http://localhost:8001/status"
 Simulates an error in app (resulting in a customized error response).
 
 ```
-curl --location "http://localhost:8001/error"
+curl --location "http://localhost:8000/error"
 ```
 
 #### ► `POST @ /payload`
@@ -45,7 +45,7 @@ curl --location "http://localhost:8001/error"
 "Uploads" new payload. Note that there's no backing store and th only effect is that uploaded payload is parsed from JSON and streamed back in response.
 
 ```
-curl --location "http://localhost:8001/payload" \
+curl --location "http://localhost:8000/payload" \
 --header "Content-Type: application/json" \
 --data "{
 	\"text\": \"hundred\",
@@ -58,7 +58,7 @@ curl --location "http://localhost:8001/payload" \
 Retrieves payload with the given number. Payload's text is always set to `foo`.
 
 ```
-curl --location "http://localhost:8001/payload/101"
+curl --location "http://localhost:8000/payload/101"
 ```
 
 ### Private endpoints
@@ -70,6 +70,6 @@ These are meant to be accessible only by internal tools (Prometheus, etc.)
 Prometheus metrics.
 
 ```
-curl --location "http://localhost:8011/metrics"
+curl --location "http://localhost:9000/metrics"
 ```
 
