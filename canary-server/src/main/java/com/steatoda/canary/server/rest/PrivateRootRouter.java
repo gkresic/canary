@@ -13,6 +13,7 @@ import io.helidon.webserver.http.ServerResponse;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.apache.commons.text.TextStringBuilder;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -43,6 +44,11 @@ public class PrivateRootRouter extends RootRouter {
 			this::metrics
 		);
 
+		rules.get("/environment",
+			routeNameHandlerFactory.create("environment"),
+			this::environment
+		);
+
 		rules.get("/healthy",
 			routeNameHandlerFactory.create("healthy"),
 			this::healthy
@@ -62,6 +68,20 @@ public class PrivateRootRouter extends RootRouter {
 		try (OutputStream ostream = response.outputStream()) {
 			prometheusMeterRegistry.scrape(ostream, mediaType.text());
 		}
+	}
+
+	private void environment(ServerRequest request, ServerResponse response) {
+
+		TextStringBuilder strBuilder = new TextStringBuilder();
+
+		strBuilder.appendSeparator("\n\n").append("Environment:");
+		System.getenv().forEach((key, value) -> strBuilder.appendSeparator("\n").append('\t').append(key).append(": ").append(value));
+
+		strBuilder.appendSeparator("\n\n").append("Properties:");
+		System.getProperties().forEach((key, value) -> strBuilder.appendSeparator("\n").append('\t').append(key).append(": ").append(value));
+
+		response.send(strBuilder.get());
+
 	}
 
 	private void healthy(ServerRequest request, ServerResponse response) {
