@@ -16,6 +16,7 @@ repositories {
 dependencies {
 
 	implementation 'ch.qos.logback:logback-classic:1.5.18'
+	implementation 'com.github.loki4j:loki-logback-appender:2.0.0'
 	implementation 'org.slf4j:slf4j-api:2.0.17'
 
 	implementation 'org.apache.commons:commons-lang3:3.17.0'
