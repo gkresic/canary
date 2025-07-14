@@ -7,9 +7,21 @@ public class CanaryCmd {
 
 	public static void main(String[] args) {
 
-		LOG.info("**************************************************");
-		LOG.info("Welcome to Canary {}...", CanaryProperties.get().getVersion());
-		LOG.info("**************************************************");
+		LOG.info(
+			"""
+			
+			
+				    \\      ____                            \s
+				    (o>   / ___|__ _ _ __   __ _ _ __ _   _\s
+				\\\\_//)   | |   / _` | '_ \\ / _` | '__| | | |
+				 \\_/_)   | |__| (_| | | | | (_| | |  | |_| |
+				  _|_     \\____\\__,_|_| |_|\\__,_|_|   \\__, |
+				                                      |___/\s
+			
+				:: Canary :: {}
+			""",
+			CanaryProperties.get().getVersion()
+		);
 
 		LOG.debug("Canary {} initializing...", CanaryProperties.get().getVersion());
 
