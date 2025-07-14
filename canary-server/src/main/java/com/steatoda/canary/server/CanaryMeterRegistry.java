@@ -2,6 +2,7 @@ package com.steatoda.canary.server;
 
 import io.github.mweirauch.micrometer.jvm.extras.ProcessMemoryMetrics;
 import io.github.mweirauch.micrometer.jvm.extras.ProcessThreadMetrics;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
@@ -40,6 +41,10 @@ public class CanaryMeterRegistry extends PrometheusMeterRegistry {
 
 		// TODO app metrics calculated on demand
 //		new UserMetrics().bindTo(this);
+
+		// some libs (Loki4j, for example) do not support DI-ing MeterRegistry,
+		// but instead register directly to Metrics.globalRegistry, so add us there
+		Metrics.addRegistry(this);
 
 	}
 
