@@ -40,6 +40,7 @@ public class LogHandler implements Handler {
 				Timer.builder("canary.rest.request")
 					.description("API requests")
 					.tag("service", routeName)
+					.tag("status", String.valueOf(response.status().code()))
 					.publishPercentiles(0.5, 0.9, 0.95, 0.99)
 					.register(meterRegistry)
 			);
