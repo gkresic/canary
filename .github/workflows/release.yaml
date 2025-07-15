@@ -44,7 +44,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          title: v${VERSION}
+          title: v${{ env.VERSION }}
 
       - name: Setup Java environment
         uses: actions/setup-java@v4
