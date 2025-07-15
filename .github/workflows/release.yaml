@@ -74,3 +74,6 @@ jobs:
       - name: Push canary-server container image to GitHub Container Registry
         run: |
           podman push ghcr.io/gkresic/canary-server:$VERSION
+          # also tag and push as 'latest'
+          podman tag ghcr.io/gkresic/canary-server:$VERSION ghcr.io/gkresic/canary-server:latest
+          podman push ghcr.io/gkresic/canary-server:latest
