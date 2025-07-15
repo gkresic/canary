@@ -1,8 +1,6 @@
 name: Release new version
 on:
   push:
-    branches:
-      - master
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+**'
 jobs:
@@ -13,7 +11,7 @@ jobs:
     steps:
       - name: Extract version from tag name
         run: |
-          VERSION=`echo ${GITHUB_REF##*/} | sed 's/^.//'`
+          export VERSION=`echo ${GITHUB_REF##*/} | sed 's/^.//'`
           echo "Releasing version: ${VERSION}"
 
       - name: Checkout source
@@ -25,7 +23,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          RELEASE_BRANCH="release/${VERSION}"
+          export RELEASE_BRANCH="release/${VERSION}"
           
           git switch -c ${RELEASE_BRANCH}
           
