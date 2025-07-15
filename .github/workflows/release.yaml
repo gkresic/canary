@@ -11,7 +11,10 @@ jobs:
     steps:
       - name: Extract version from tag name
         run: |
-          export VERSION=`echo ${GITHUB_REF##*/} | sed 's/^.//'`
+          VERSION=`echo ${GITHUB_REF##*/} | sed 's/^.//'`
+          # make it available to all subsequent jobs
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          
           echo "Releasing version: ${VERSION}"
 
       - name: Checkout source
@@ -23,7 +26,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          export RELEASE_BRANCH="release/${VERSION}"
+          RELEASE_BRANCH="release/${VERSION}"
           
           git switch -c ${RELEASE_BRANCH}
           
