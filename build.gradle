@@ -8,6 +8,6 @@ allprojects {
 
     group = 'com.steatoda.canary'
 
-    version = '<unreleased>'
+	version = '25.07.16'
 
 }
